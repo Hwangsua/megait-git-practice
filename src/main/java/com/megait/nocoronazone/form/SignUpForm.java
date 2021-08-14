@@ -17,12 +17,10 @@ public class SignUpForm {
     private String email;
 
     @Pattern(
-            regexp = "^[a-zA-Z가-힣][0-9a-zA-Z가-힣]{4,8}$",
+            regexp = "^[a-zA-Z가-힣][0-9a-zA-Z가-힣]{3,7}$",
             message = "닉네임은 영어 또는 한글로 시작하는 4자 이상 8자 이하여야합니다."
     )
     private String nickname;
-
-    private boolean nicknameCk;
 
     @Pattern(
             regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$",
