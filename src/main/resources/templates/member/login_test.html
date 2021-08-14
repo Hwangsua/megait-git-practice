@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/common_layout}" th:with="activeTab='login', title='Login'">
+<head>
+    <script type="text/javascript" src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.0.js"
+            charSet="utf-8">
+    </script>
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>-->
+<!--    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->
+    <link th:href="@{/css/user/login.css}" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+            <div class="login-header">
+                <h3 class="login-title">로그인</h3>
+            </div>
+            <div class="info-check">
+                <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                    <p>이메일 혹은 패스워드가 정확하지 않습니다.</p>
+                    <p><a href="#" th:href="@{/signup}">회원 가입</a></p>
+                </div>
+            </div>
+            <div class="login-form">
+                <form action="" method="post" name="login">
+                    <div class="form-group">
+                        <input type="text" name="userEmail" class="form-control"
+                               id="email" placeholder="아이디(이메일)을 입력하세요.">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="userPw" class="form-control"
+                               id="password" placeholder="비밀번호를 입력하세요.">
+                    </div>
+                    <div class="checks">
+                        <div class="form-check"> <!-- 자동 로그인 -->
+                            <input type="checkbox" class="form-check-input" id="remember-me"
+                                   name="remember-me" checked/>
+                            <label class="form-check-label" for="remember-me" aria-describedby="rememberMeHelp">아이디 저장</label>
+                        </div>
+                        <div class="find-info">
+                            <a href="#" class="id-password-check">아이디/비밀번호 찾기</a>
+                        </div>
+                    </div>
+                    <div class="login-buttons">
+                        <div class="item">
+                            <button type="submit" class="buttons">로그인</button>
+                        </div>
+                        <div class="item">
+                            <button type="submit" class="buttons">회원가입</button>
+                        </div>
+                        <div class="item">
+                            <button type="submit" class="buttons">카카오로 로그인</button>
+                        </div>
+                        <div class="item">
+                            <button type="submit" class="buttons">네이버로 로그인</button>
+                        </div>
+                        <div id="naverIdLogin"></div>
+                    </div>
+                </form>
+            </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var naverLogin = new naver.LoginWithNaverId(
+        {
+            clientId : "1ZBVNNAoieotTZrmINNV",
+            callbackUrl: "http://127.0.0.1/8080/navercallback",
+            isPopup: false,
+            loginButton: {color:"green",type:3,height60}
+        }
+    );
+    naverLogin.init();
+</script>
+</body>
+</html>
