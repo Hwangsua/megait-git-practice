@@ -12,7 +12,7 @@
 
     <script th:inline="javascript">
         $(document).ready(function (){
-            let nicknameRegexCheck = false;
+            let nicknameRegexCheck = true;
             let nicknameDuplicateCheck = false;
 
             $("#nickname").on('focus',function (){
@@ -32,13 +32,15 @@
                     $('#nicknameCheck').css('color','red');
                 }
             });
-
-
-            $("#duplicateCheck").click(function () {
+            $("#nicknameDuplicateCheck").click(function () {
 
                 let nickname = $('#nickname').val();
+                console.log(nickname);
 
-                if(nickname.length === 0 || nickname === null) return alert('닉네임 입력하세요.');
+                if(!nicknameRegexCheck){
+                    alert('닉네임 양식에 맞추세요.');
+                    return false;
+                }
 
                 $.ajax({
                     url : '/nicknameCk',
@@ -56,6 +58,37 @@
                 });
 
             });
+
+            $('.signup-complete').click(function (){
+                let email = $('#email').val();
+                let password = $('#password').val();
+                let passwordCheck = $('#passwordCheck').val();
+
+                if(email == ''){
+                    alert('이메일을 입력하세요');
+                    return false;
+                }
+
+                if(password == '' || passwordCheck == '') {
+                    alert('패스워드 입력하세요');
+                    return false;
+                }
+
+                if(password != passwordCheck){
+                    alert('두 패스워드가 일치하지 않습니다.');
+                    return false;
+                }
+
+                if(!nicknameDuplicateCheck){
+                    alert('닉네임 중복 확인해주세요.');
+                    return false;
+                }
+
+                $('form[name=signup]').submit();
+
+            });
+
+
         });
     </script>
 
@@ -89,7 +122,7 @@
                 </div>
                 <div class="form-group">
                     <input type="text" th:field="*{nickname}" name="userNickname" class="form-control" id="nickname" placeholder="닉네임을 입력하세요.">
-                    <button id ="duplicateCheck">중복확인</button>
+                    <button type="button" id ="nicknameDuplicateCheck">중복확인</button>
                     <div class = "check_font" id="nicknameCheck"></div>
                 </div>
                 <div class="none" style="visibility: hidden;height: 10px"></div>
@@ -128,7 +161,9 @@
                 </div>
                 <div class="signup-form2">
                     <div class="agree-box"> <input type="checkbox" th:field="*{agreeTermsOfService}" th:value="true">[필수] 약관에 동의합니다.</div>
-                    <button type="submit" class="signup-complete">회원가입 완료</button>
+                    <!--<button type="submit" class="signup-complete">회원가입 완료</button>-->
+                    <button type="button" class="signup-complete">회원가입 완료</button>
+
                 </div>
 
             </form>

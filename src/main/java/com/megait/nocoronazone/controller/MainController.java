@@ -39,7 +39,10 @@ public class MainController {
     @PostMapping("/signup")
     public String signUpSubmit(@Valid SignUpForm signUpForm, Errors errors) {
 
+        System.out.println("회원가입 요청");
+
         if(errors.hasErrors()){
+            System.out.println("에러발생");
             return "member/signup_test";
         }
 
@@ -55,8 +58,7 @@ public class MainController {
     @RequestMapping("/nicknameCk")
     public String checkNickname(@RequestParam String nickname){
 
-        System.out.println(nickname);
-        log.info("실행");
+        System.out.println(nickname+"닉네임 확인");
 
         JsonObject object = new JsonObject();
 
@@ -68,8 +70,6 @@ public class MainController {
             object.addProperty("result", true);
             object.addProperty("message","사용 가능한 닉네임입니다.");
         }
-
-        //TODO - 0811 중복확인 요청 구현하기
 
         return object.toString();
     }
