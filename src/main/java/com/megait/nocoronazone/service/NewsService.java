@@ -16,6 +16,9 @@ import java.util.List;
 @Validated
 public class NewsService {
 
+
+
+
     @PostConstruct
     public List<Article> getArticleList() throws IOException {
 
