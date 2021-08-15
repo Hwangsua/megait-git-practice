@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.megait.nocoronazone.domain.Member;
 import com.megait.nocoronazone.form.SignUpForm;
 import com.megait.nocoronazone.service.MemberService;
+import com.megait.nocoronazone.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -26,6 +27,7 @@ import java.util.Map;
 public class MainController {
 
     private final MemberService memberService;
+    private final NewsService newsService;
 
     @RequestMapping("/")
     public String index() {
@@ -99,12 +101,15 @@ public class MainController {
 
 
     @GetMapping("/news/article")
-    public String article(){
+    public String article(Model model) throws IOException {
+        model.addAttribute("articleList", newsService.getArticleList());
+
         return "co_info/article";
     }
 
     @GetMapping("/news")
     public String news(){
+
         return "co_info/article";
     }
 
