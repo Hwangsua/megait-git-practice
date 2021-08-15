@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.megait.nocoronazone.domain.Member;
 import com.megait.nocoronazone.form.SignUpForm;
 import com.megait.nocoronazone.service.MemberService;
+import com.megait.nocoronazone.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import netscape.javascript.JSObject;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class MainController {
 
     private final MemberService memberService;
+    private final NewsService newsService;
 
     @RequestMapping("/")
     public String index() {
@@ -95,6 +97,50 @@ public class MainController {
     }
 
 
+<<<<<<< HEAD
+=======
+    @GetMapping("/news/article")
+    public String article(Model model) throws IOException {
+        model.addAttribute("articleList", newsService.getArticleList());
+
+        return "co_info/article";
+    }
+
+    @GetMapping("/news")
+    public String news(){
+
+        return "co_info/article";
+    }
+
+
+    @GetMapping("/test")
+    public String test(Model model) throws IOException {
+
+        ClassPathResource resource = new ClassPathResource("csv/article.csv");
+        List<String> stringList = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8);
+        int i = 0;
+
+        for(String s : stringList){
+            i++;
+
+            String[] arr = s.replaceAll("^\"|\"$", "").split("\\|");
+            model.addAttribute("pressName", arr[0]);
+            model.addAttribute("pressImgUrl", arr[1]);
+            model.addAttribute("articleTitle", arr[2]);
+            model.addAttribute("articleContent", arr[3]);
+            model.addAttribute("articleLink", arr[4]);
+            model.addAttribute("articleImgUrl", arr[5]);
+            System.out.println(arr[5]);
+            if (i == 1){
+                break;
+            }
+        }
+
+        return "co_info/article";
+    }
+
+
+>>>>>>> ac59875
 //    @GetMapping("/settings")
 //    public String setUpForm(){
 //        return "member/settings";
