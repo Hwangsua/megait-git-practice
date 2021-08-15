@@ -7,17 +7,14 @@ import com.megait.nocoronazone.form.SignUpForm;
 import com.megait.nocoronazone.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
+import netscape.javascript.JSObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -98,44 +95,6 @@ public class MainController {
     }
 
 
-    @GetMapping("/news/article")
-    public String article(){
-        return "co_info/article";
-    }
-
-    @GetMapping("/news")
-    public String news(){
-        return "co_info/article";
-    }
-
-
-    @GetMapping("/test")
-    public String test(Model model) throws IOException {
-
-        ClassPathResource resource = new ClassPathResource("csv/article.csv");
-        List<String> stringList = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8);
-        int i = 0;
-
-        for(String s : stringList){
-            i++;
-
-            String[] arr = s.replaceAll("^\"|\"$", "").split("\\|");
-            model.addAttribute("pressName", arr[0]);
-            model.addAttribute("pressImgUrl", arr[1]);
-            model.addAttribute("articleTitle", arr[2]);
-            model.addAttribute("articleContent", arr[3]);
-            model.addAttribute("articleLink", arr[4]);
-            model.addAttribute("articleImgUrl", arr[5]);
-            System.out.println(arr[5]);
-            if (i == 1){
-                break;
-            }
-        }
-
-        return "co_info/article";
-    }
-
-
 //    @GetMapping("/settings")
 //    public String setUpForm(){
 //        return "member/settings";
@@ -191,10 +150,10 @@ public class MainController {
 //        return "co_sns/follower";
 //    }
 //
-    @GetMapping("/{nickname}")
-    public String profile(@PathVariable String nickname){
-        return "co_info/article";
-    }
+//    @GetMapping("/{nickname}")
+//    public String profile(@PathVariable String nickname){
+//        return "co_sns/profile";
+//    }
 
 
 }
