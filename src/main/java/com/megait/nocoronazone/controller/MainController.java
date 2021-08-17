@@ -95,7 +95,15 @@ public class MainController {
 
     @GetMapping("/news/article")
     public String article(Model model) throws IOException {
+
         model.addAttribute("articleList", newsService.getArticleList());
+        return "co_info/article";
+    }
+
+    @GetMapping("/test")
+    public String test() throws IOException, InterruptedException {
+
+        newsService.setArticleFile("Seoul");
 
         return "co_info/article";
     }
