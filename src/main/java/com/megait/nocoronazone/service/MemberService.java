@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +23,8 @@ import java.util.Optional;
 public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
+
+    private final EmailService emailService;
 
     @PostConstruct
     @Profile("local")
@@ -40,24 +43,31 @@ public class MemberService implements UserDetailsService {
 
     public Member processNewUser(SignUpForm signUpForm){
 
-        Member user = Member.builder()
+        Member member = Member.builder()
                 .email(signUpForm.getEmail())
                 .nickname(signUpForm.getNickname())
                 .password(signUpForm.getPassword())
                 .memberType(MemberType.ROLE_USER)
                 .build();
 
-        Member newUser = memberRepository.save(user);
+        Member newMember = memberRepository.save(member);
 
-        //TODO - 0811 회원인증 이메일 전송 구현
-        return newUser;
+        emailService.sendEmail(newMember);
+
+        return newMember;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //TODO - 0811 이메일
-        return null;
+        Optional<Member> optional = memberRepository.findByEmail(username);
+        if (optional.isEmpty()){
+            throw new UsernameNotFoundException(username); // 이거 대신 return null 하면 안된다.
+        }
+
+        return new MemberUser(optional.get());
     }
+
+
 
     public void checkNickname(String nickname) {
 
@@ -65,5 +75,20 @@ public class MemberService implements UserDetailsService {
         if(member.isEmpty()){
             throw new IllegalArgumentException("사용가능한 닉네임");
         }
+    }
+
+    public void checkEmailToken(String token, String email) {
+
+        Optional<Member> opt = memberRepository.findByEmail(email);
+        if (opt.isEmpty()){
+            throw new IllegalArgumentException("이메일 틀림");
+        }
+
+        Member member = opt.get();
+        if(!member.isValidToken(token)){
+            throw new IllegalArgumentException("이메일 틀림");
+        }
+
+        member.completeSignup();
     }
 }

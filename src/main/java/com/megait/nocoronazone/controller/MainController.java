@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
 
@@ -38,8 +39,6 @@ public class MainController {
     @PostMapping("/signup")
     public String signUpSubmit(@Valid SignUpForm signUpForm, Errors errors) {
 
-        System.out.println("회원가입 요청");
-
         if(errors.hasErrors()){
             System.out.println("에러발생");
             return "member/signup_test";
@@ -47,7 +46,9 @@ public class MainController {
 
         Member member = memberService.processNewUser(signUpForm);
 
-        return "/user/email_check";
+        //memberService.login(member);
+
+        return "/member/checked-email";
     }
 
 
@@ -71,10 +72,28 @@ public class MainController {
         return object.toString();
     }
 
+    @GetMapping ("/email-check-token")
+    public String emailCheckToken(String token, String email, Model model){
+
+        try{
+            memberService.checkEmailToken(token, email);
+        }catch (IllegalArgumentException e){
+            model.addAttribute("error","wrong");
+            return "member/email_check_result";
+        }
+
+        model.addAttribute("success","사용자님");
+        return "member/email_check_result";
+
+    }
+
     @GetMapping("/login")
     public String loginForm() {
         return "member/login_test";
     }
+
+
+
 
 //    @PostMapping("/login")
 //    public String loginSubmit(@Valid LoginForm loginForm, Errors errors){
