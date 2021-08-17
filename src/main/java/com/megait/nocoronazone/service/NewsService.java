@@ -1,6 +1,7 @@
 package com.megait.nocoronazone.service;
 
 import com.megait.nocoronazone.domain.Article;
+import com.megait.nocoronazone.thread.ProcessOutputThread;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -10,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 @Service
 @Validated
@@ -61,29 +63,24 @@ public class NewsService {
         try {
             process = runtime.exec(runFilePath);
             System.out.println("실행");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null)
-                System.out.println("tasklist: " + line);
 
 
-//            StringBuffer stdMsgT = new StringBuffer();
-//            stdMsgT = new ProcessOutputThread(process.getInputStream(), stdMsg);
-//            stdMsgT.start();
-//
-//            StringBuffer errMsg = new StringBuffer();
-//            // 스레드로 errorStream 버퍼 비우기
-//            errMsgT = new ProcessOutputThread(process.getErrorStream(), errMsg);
-//            errMsgT.start();
+            StringBuffer stdMsg = new StringBuffer();
+
+            ProcessOutputThread outputThread = new ProcessOutputThread(process.getInputStream(), stdMsg);
+            outputThread.start();
+
+            StringBuffer errMsg = new StringBuffer();
+
+            outputThread = new ProcessOutputThread(process.getErrorStream(),errMsg);
+            outputThread.start();
+
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            //process.getErrorStream().close();
-            //process.getInputStream().close();
-           // process.getOutputStream().close();
 
             process.waitFor();
-            System.out.println("완료");
             process.destroy();
 
         }
