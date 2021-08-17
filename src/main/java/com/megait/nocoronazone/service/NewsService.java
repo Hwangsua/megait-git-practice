@@ -2,6 +2,7 @@ package com.megait.nocoronazone.service;
 
 import com.megait.nocoronazone.domain.Article;
 import com.megait.nocoronazone.thread.ProcessOutputThread;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -10,11 +11,13 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
 @Service
 @Validated
+@Slf4j
 public class NewsService {
 
 
@@ -52,7 +55,7 @@ public class NewsService {
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(runFilePath, true));
 
         try{
-            bufferedWriter.write(" "+keyword);
+            bufferedWriter.write(" "+ new String(keyword.getBytes(), StandardCharsets.UTF_8)+"\r\n");
             bufferedWriter.flush();
         }catch (Exception e){
             e.printStackTrace();
@@ -64,7 +67,6 @@ public class NewsService {
             process = runtime.exec(runFilePath);
             System.out.println("실행");
 
-
             StringBuffer stdMsg = new StringBuffer();
 
             ProcessOutputThread outputThread = new ProcessOutputThread(process.getInputStream(), stdMsg);
@@ -75,12 +77,14 @@ public class NewsService {
             outputThread = new ProcessOutputThread(process.getErrorStream(),errMsg);
             outputThread.start();
 
+            process.waitFor();
 
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
 
-            process.waitFor();
+
+            System.out.println("완료");
             process.destroy();
 
         }
@@ -88,7 +92,14 @@ public class NewsService {
     }
 
 
-    public List<Article> getArticleList() throws IOException {
+    public List<Article> getArticleList(String keyword) throws IOException {
+
+        try {
+            this.setArticleFile(keyword);
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
 
         ClassPathResource resource = new ClassPathResource("csv/article.csv");
         List<String> stringList = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8);
@@ -98,6 +109,7 @@ public class NewsService {
         for(String s : stringList){
 
             String[] arr = s.replaceAll("^\"|\"$", "").split("\\|");
+            log.info(Arrays.toString(arr));
             Article article = Article.builder()
                     .pressName(arr[0])
                     .pressImgUrl(arr[1])

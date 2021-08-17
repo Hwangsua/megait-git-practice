@@ -47,9 +47,7 @@ public class MainController {
 
         Member member = memberService.processNewUser(signUpForm);
 
-        //TODO - 0808 email_check 구현하기
-        //return "/user/email_check";
-        return "redirect:/";
+        return "/user/email_check";
     }
 
 
@@ -94,17 +92,20 @@ public class MainController {
     }
 
     @GetMapping("/news/article")
-    public String article(Model model) throws IOException {
+    public String article(Model model) throws IOException, InterruptedException {
 
-        model.addAttribute("articleList", newsService.getArticleList());
+        try {
+            model.addAttribute("articleList",newsService.getArticleList("경기도"));
+        }catch (IOException e){
+            e.printStackTrace();
+        }
         return "co_info/article";
     }
 
     @GetMapping("/test")
     public String test() throws IOException, InterruptedException {
 
-        newsService.setArticleFile("Seoul");
-
+        newsService.setArticleFile("제주도");
         return "co_info/article";
     }
 

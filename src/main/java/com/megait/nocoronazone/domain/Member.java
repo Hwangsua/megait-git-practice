@@ -38,4 +38,7 @@ public class Member {
     @Enumerated
     private MemberType memberType;
 
+    public void generateEmailCheckToken() {
+
+    }
 }

@@ -35,7 +35,7 @@ public class MemberService implements UserDetailsService {
                 .build();
 
         Member newMember = memberRepository.save(member);
-       // emailService.sendEmail(newMember);
+        //emailService.sendEmail(newMember);
     }
 
     public Member processNewUser(SignUpForm signUpForm){
