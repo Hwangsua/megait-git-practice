@@ -4,9 +4,9 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-.bat
-.csv
-.properties
+**/src/main/resources/bat/article.bat
+**/src/main/resources/csv/article.csv
+**/src/main/resources/application.properties
 
 
 ### STS ###
