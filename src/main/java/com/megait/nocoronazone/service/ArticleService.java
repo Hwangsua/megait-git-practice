@@ -4,28 +4,35 @@ import com.megait.nocoronazone.domain.Article;
 import com.megait.nocoronazone.thread.ProcessOutputThread;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 @Validated
 @Slf4j
 @RequiredArgsConstructor
-public class NewsService {
+public class ArticleService {
 
-    private final String csvPath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\csv\\local_article.csv";
-    private final String batPath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\bat\\local_article.bat";
+    private final String localCsvPath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\csv\\local_article.csv";
+    private final String localBatPath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\bat\\local_article.bat";
+    private final String vaccineCsvPath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\csv\\vaccine_article.csv";
+    private final String vaccineBatPath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\bat\\vaccine_article.bat";
 
 
-    public void setArticleFile(String keyword1, String keyword2) throws InterruptedException, IOException {
+    public String getCommendLineArg(List<String> list){
+        return String.join(" ", list);
+    }
+
+    public void setArticleFile(String LineArg, String batPath, String csvPath) throws InterruptedException, IOException {
 
         new FileOutputStream(csvPath).close();
 
@@ -33,7 +40,8 @@ public class NewsService {
         Process process = null;
 
         try {
-            process = runtime.exec(batPath + " " + keyword1 + " " + keyword2 + " " + csvPath );
+            System.out.println("명령 keyword : "+ LineArg);
+            process = runtime.exec(batPath + " " +  LineArg);
 
             StringBuffer stdMsg = new StringBuffer();
 
@@ -57,10 +65,10 @@ public class NewsService {
     }
 
 
-    public List<Article> getArticleList(String keyword1, String keyword2) throws IOException {
+    public List<Article> getArticleList(String LineArg, String batPath, String csvPath) throws IOException {
 
         try {
-            setArticleFile(keyword1,keyword2);
+            setArticleFile(LineArg, batPath, csvPath);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -94,4 +102,20 @@ public class NewsService {
         return articleList;
 
     }
+
+    public List<Article> getLocalArticleList(String mainCityName, String subCityName) throws IOException {
+
+        String LineArg = getCommendLineArg(Arrays.asList(new String[]{mainCityName,subCityName, localCsvPath }));
+        return getArticleList(LineArg, localBatPath, localCsvPath);
+
+    }
+
+    public List<Article> getVaccineArticleList() throws IOException {
+
+        String LineArg = getCommendLineArg(Arrays.asList(new String[]{vaccineCsvPath}));
+        return getArticleList(LineArg, vaccineBatPath, vaccineCsvPath);
+
+    }
+
+
 }

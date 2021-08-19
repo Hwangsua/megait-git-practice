@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.megait.nocoronazone.domain.Article;
 import com.megait.nocoronazone.domain.Member;
 import com.megait.nocoronazone.form.SignUpForm;
+import com.megait.nocoronazone.service.ArticleService;
 import com.megait.nocoronazone.service.MemberService;
 import com.megait.nocoronazone.service.NewsService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,8 @@ public class MainController {
 
     private final MemberService memberService;
     private final NewsService newsService;
+    private final ArticleService articleService;
+    
 
     @RequestMapping("/")
     public String index() {
@@ -121,7 +124,7 @@ public class MainController {
     public String article(Model model) throws IOException {
       
         try {
-            model.addAttribute("articleList",newsService.getArticleList("서울","전체"));
+            model.addAttribute("articleList",articleService.getLocalArticleList("서울", "전체"));
         }catch (IOException  e){
             e.printStackTrace();
         }
@@ -129,13 +132,24 @@ public class MainController {
         return "co_info/article";
     }
 
-    //@ResponseBody
+    @GetMapping("/vaccine")
+    public String vaccine(Model model) throws IOException {
+
+        try {
+            model.addAttribute("articleList",articleService.getVaccineArticleList());
+        }catch (IOException  e){
+            e.printStackTrace();
+        }
+
+        return "co_info/vaccine";
+    }
+
     @GetMapping("/local_article")
     public String article(@RequestParam String mainCityName, @RequestParam String subCityName, Model model){
         System.out.println("신호옴");
 
         try {
-            model.addAttribute("articleList",newsService.getArticleList(mainCityName, subCityName));
+            model.addAttribute("articleList",articleService.getLocalArticleList(mainCityName, subCityName));
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -143,38 +157,6 @@ public class MainController {
         return "/co_info/article :: #article-list";
     }
 
-//    @GetMapping("/local_article")
-//    public String article(@RequestParam String mainCityName, @RequestParam String subCityName, Model model){
-//        System.out.println("신호옴");
-//
-//        try {
-//            model.addAttribute("articleList",newsService.getArticleList(mainCityName, subCityName));
-//        }catch (IOException e){
-//            e.printStackTrace();
-//        }
-//
-//        return "co_info/article :: #article-list";
-//    }
-
-//    @ResponseBody
-//    @GetMapping("/local_article")
-//    public String article(@RequestParam String mainCityName, @RequestParam String subCityName, Model model){
-//
-//        JsonObject object = new JsonObject();
-//        String json;
-//
-//        try {
-//            json = new Gson().toJson(newsService.getArticleList(mainCityName, subCityName));
-//            object.addProperty("result",true);
-//            object.addProperty("message",json);
-//        }catch (IOException  e){
-//            e.printStackTrace();
-//            object.addProperty("result",false);
-//            object.addProperty("message","실패");
-//        }
-//
-//        return object.toString();
-//    }
 
 
 

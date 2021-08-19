@@ -17,15 +17,26 @@
             let mainCityName = mainCitySelect.options[mainCitySelect.selectedIndex].text;
             let subCityName = subCitySelect.options[subCitySelect.selectedIndex].text;
 
+            // alert(subCityName)
+
             $.ajax({
                 url : '/local_article',
                 type : 'GET',
                 data : {'mainCityName': mainCityName ,'subCityName': subCityName},
                 contentType : 'application/json',
-
-            }).done(function (fragment) {
-                $("#article-list").replaceWith(fragment);
+                dataType: 'json',
+                // success:function(result){
+                //     alert(result.message);
+                //     $('#article-list').replaceWith(result.message);
+                // },
+                // error:function (error){
+                //     alert(error);
+                // }
+            }).done(function (result) {
+                $('#article-list').replaceWith(result);
             });
+
+
 
         }
 
@@ -63,7 +74,6 @@
                 </select>
             </div>
         </div>
-        <div id="article-list">
         <div th:fragment="ArticleListFragment(articleList)">
             <div th:each="article:${articleList}">
                 <div class="article" th:onclick="'window.open(\''+ @{${article.articleLink}} + '\')'">
@@ -86,7 +96,6 @@
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </div>
 </div>

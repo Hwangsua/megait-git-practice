@@ -17,15 +17,28 @@
             let mainCityName = mainCitySelect.options[mainCitySelect.selectedIndex].text;
             let subCityName = subCitySelect.options[subCitySelect.selectedIndex].text;
 
+            // alert(subCityName)
+
             $.ajax({
                 url : '/local_article',
                 type : 'GET',
                 data : {'mainCityName': mainCityName ,'subCityName': subCityName},
                 contentType : 'application/json',
+                dataType: 'json',
+                success:function(result){
 
-            }).done(function (fragment) {
-                $("#article-list").replaceWith(fragment);
+                   // console.log(result.message);
+                    let str = JSON.stringify(result.message);
+                    console.log(str);
+
+                    console.log(result.message.length);
+
+                },
+                error:function (error){
+                    alert(error);
+                }
             });
+
 
         }
 
