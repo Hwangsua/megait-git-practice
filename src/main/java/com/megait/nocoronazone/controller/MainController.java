@@ -1,12 +1,16 @@
 package com.megait.nocoronazone.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.megait.nocoronazone.domain.Article;
 import com.megait.nocoronazone.domain.Member;
 import com.megait.nocoronazone.form.SignUpForm;
 import com.megait.nocoronazone.service.MemberService;
 import com.megait.nocoronazone.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -14,7 +18,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -55,8 +63,6 @@ public class MainController {
     @ResponseBody
     @RequestMapping("/nicknameCk")
     public String checkNickname(@RequestParam String nickname){
-
-        System.out.println(nickname+"닉네임 확인");
 
         JsonObject object = new JsonObject();
 
@@ -110,29 +116,79 @@ public class MainController {
         return "redirect:/";
     }
 
-    @GetMapping("/news/article")
-    public String article(Model model) throws IOException, InterruptedException {
+
+    @RequestMapping("/article")
+    public String article(Model model) throws IOException {
+      
+        try {
+            model.addAttribute("articleList",newsService.getArticleList("서울","전체"));
+        }catch (IOException  e){
+            e.printStackTrace();
+        }
+
+        return "co_info/article";
+    }
+
+    //@ResponseBody
+    @GetMapping("/local_article")
+    public String article(@RequestParam String mainCityName, @RequestParam String subCityName, Model model){
+        System.out.println("신호옴");
 
         try {
-            model.addAttribute("articleList",newsService.getArticleList("경기도"));
+            model.addAttribute("articleList",newsService.getArticleList(mainCityName, subCityName));
         }catch (IOException e){
             e.printStackTrace();
         }
-        return "co_info/article";
+
+        return "/co_info/article :: #article-list";
     }
 
-    @GetMapping("/test")
-    public String test() throws IOException, InterruptedException {
+//    @GetMapping("/local_article")
+//    public String article(@RequestParam String mainCityName, @RequestParam String subCityName, Model model){
+//        System.out.println("신호옴");
+//
+//        try {
+//            model.addAttribute("articleList",newsService.getArticleList(mainCityName, subCityName));
+//        }catch (IOException e){
+//            e.printStackTrace();
+//        }
+//
+//        return "co_info/article :: #article-list";
+//    }
 
-        newsService.setArticleFile("제주도");
-        return "co_info/article";
-    }
+//    @ResponseBody
+//    @GetMapping("/local_article")
+//    public String article(@RequestParam String mainCityName, @RequestParam String subCityName, Model model){
+//
+//        JsonObject object = new JsonObject();
+//        String json;
+//
+//        try {
+//            json = new Gson().toJson(newsService.getArticleList(mainCityName, subCityName));
+//            object.addProperty("result",true);
+//            object.addProperty("message",json);
+//        }catch (IOException  e){
+//            e.printStackTrace();
+//            object.addProperty("result",false);
+//            object.addProperty("message","실패");
+//        }
+//
+//        return object.toString();
+//    }
 
-    @PostMapping("/news/article")
-    public String filterArticle(){
 
-        return "/";
-    }
+
+//    @GetMapping("/test")
+//    public String test(Model model) throws IOException, InterruptedException {
+//        try {
+//            newsService.setArticleFile("서울","구로구");
+//            model.addAttribute("articleList",newsService.getArticleList("서울","서울전체"));
+//        }catch (InterruptedException e){
+//            e.printStackTrace();
+//        }
+//        return "co_info/article";
+//    }
+
 
 
 //    @GetMapping("/news")

@@ -2,6 +2,7 @@ package com.megait.nocoronazone.service;
 
 import com.megait.nocoronazone.domain.Article;
 import com.megait.nocoronazone.thread.ProcessOutputThread;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -10,62 +11,29 @@ import org.springframework.validation.annotation.Validated;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 @Service
 @Validated
 @Slf4j
+@RequiredArgsConstructor
 public class NewsService {
 
-
-    private void initArticleRunFile(String frameFilePath, String runFilePath){
-
-        try (FileInputStream fIn = new FileInputStream(new File(frameFilePath));
-             FileOutputStream fOut = new FileOutputStream(new File(runFilePath))){
-
-            File file = new File(frameFilePath);
-            long size = file.length();
-
-            byte[] arr = new byte[(int)size];
-
-            fIn.read(arr);
-            fOut.write(arr);
-
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private final String csvPath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\csv\\article.csv";
+    private final String batPath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\bat\\article.bat";
 
 
-    public void setArticleFile(String keyword) throws InterruptedException, IOException {
+    public void setArticleFile(String keyword1, String keyword2) throws InterruptedException, IOException {
+
+        new FileOutputStream(csvPath).close();
 
         Runtime runtime = Runtime.getRuntime();
         Process process = null;
-//        String frameFilePath = new ClassPathResource("bat/article_frame.txt").getFile().getAbsolutePath();
-//        String runFilePath = new ClassPathResource("bat/article.txt").getFile().getAbsolutePath();
-
-        String frameFilePath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\bat\\article_frame.bat";
-        String runFilePath = "D:\\2021_15_webdev_hsa\\project_corona_before\\src\\main\\resources\\bat\\article.bat";
-
-        initArticleRunFile(frameFilePath, runFilePath);
-
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(runFilePath, true));
-
-        try{
-            bufferedWriter.write(" "+ new String(keyword.getBytes(), StandardCharsets.UTF_8)+"\r\n");
-            bufferedWriter.flush();
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            bufferedWriter.close();
-        }
 
         try {
-            process = runtime.exec(runFilePath);
-            System.out.println("실행");
+            process = runtime.exec(batPath + " " + keyword1 + " " + keyword2 );
 
             StringBuffer stdMsg = new StringBuffer();
 
@@ -82,9 +50,6 @@ public class NewsService {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-
-
-            System.out.println("완료");
             process.destroy();
 
         }
@@ -92,24 +57,27 @@ public class NewsService {
     }
 
 
-    public List<Article> getArticleList(String keyword) throws IOException {
+    public List<Article> getArticleList(String keyword1, String keyword2) throws IOException {
 
         try {
-            this.setArticleFile(keyword);
-        }catch (InterruptedException e){
+            setArticleFile(keyword1,keyword2);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        List<String> stringList = Files.readAllLines(Path.of(csvPath), StandardCharsets.UTF_8);
 
-        ClassPathResource resource = new ClassPathResource("csv/article.csv");
-        List<String> stringList = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8);
+        while (stringList.size() <= 1){
+            stringList = Files.readAllLines(Path.of(csvPath), StandardCharsets.UTF_8);
+            System.out.println(stringList.size());
+        }
+
 
         List<Article> articleList = new ArrayList<>();
 
         for(String s : stringList){
 
             String[] arr = s.replaceAll("^\"|\"$", "").split("\\|");
-            log.info(Arrays.toString(arr));
             Article article = Article.builder()
                     .pressName(arr[0])
                     .pressImgUrl(arr[1])
@@ -118,7 +86,7 @@ public class NewsService {
                     .articleLink(arr[4])
                     .articleImgUrl(arr[5])
                     .build();
-
+            System.out.println(arr[0]);
             articleList.add(article);
 
         }
